@@ -136,6 +136,41 @@ This script will:
 - Execute one-click initializer (pages, menus, taxonomy, sample data)
 - Flush rewrite rules
 
+## 1.4) One-command Reload After Code Changes
+
+Script path:
+
+- `scripts/reload.sh`
+
+Make executable:
+
+```bash
+chmod +x scripts/reload.sh
+```
+
+Common usage:
+
+```bash
+# Debug mode quick reload
+bash scripts/reload.sh
+
+# Production mode quick reload
+bash scripts/reload.sh --prod
+
+# Rebuild containers when compose/env/image changed
+bash scripts/reload.sh --prod --rebuild
+
+# Include short logs for troubleshooting
+bash scripts/reload.sh --logs
+```
+
+What it does:
+
+- Auto-creates `.env` from debug/prod template when missing
+- Restart (or rebuild) stack
+- Re-apply WordPress theme/plugins/setup via `wp-apply-project-setup.sh`
+- Show compose status (and optional recent logs)
+
 ## 2) Theme and Plugin Activation
 
 After first WordPress login:
