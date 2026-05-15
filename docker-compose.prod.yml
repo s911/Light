@@ -11,6 +11,8 @@ services:
       - ./wp-content/themes/stage-lighting:/var/www/html/wp-content/themes/stage-lighting
       - ./wp-content/plugins/stage-lighting-b2b:/var/www/html/wp-content/plugins/stage-lighting-b2b
       - ./wp-content/plugins/stage-lighting-setup:/var/www/html/wp-content/plugins/stage-lighting-setup
+      - ./wp-content/plugins/stage-lighting-importer:/var/www/html/wp-content/plugins/stage-lighting-importer
+      - ./wp-content/plugins/stage-lighting-marketing:/var/www/html/wp-content/plugins/stage-lighting-marketing
       - wp_data:/var/www/html
 
   wpcli:

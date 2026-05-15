@@ -1,0 +1,277 @@
+舞台灯独立站需求文档
+Stage Lighting E-commerce Website - Product Requirements Document
+Version 1.0 | 2025-05-13
+1. 项目概述 / Project Overview
+项目
+说明
+项目名称
+舞台灯独立站（B2C + B2B 引流）
+目标市场
+海外（北美/欧洲/东南亚为主）
+技术栈
+WordPress + WooCommerce
+产品规模
+50+ SKU，多品类
+核心目标
+① 线上零售下单  ② 引流线下大货单（B2B询盘）
+网站语言
+英文（English Only）
+视觉风格
+暗黑科技风（Dark Tech Style）
+2. 产品分类体系 / Product Categories
+2.1 一级分类
+分类
+英文标识
+包含子类
+舞台灯具
+Stage Lighting
+Moving Head (Beam/Wash/Spot), LED Par, Follow Spot, Laser, Strobe
+控制设备
+Lighting Control
+DMX Console, Dimmer, Signal Distributor, Wireless DMX
+舞台结构
+Stage Structure
+Truss System, Lighting Stand, Hanging System
+特效设备
+Special Effects
+Fog Machine, Hazer, Bubble Machine, Flame Machine, Snow Machine
+线缆配件
+Cables & Accessories
+DMX Cable, Power Cable, Connector, Flight Case
+2.2 应用场景标签（跨品类筛选）
+场景
+英文标识
+演唱会/巡演
+Concert & Touring
+剧院/礼堂
+Theater & Auditorium
+电视演播
+TV Studio
+夜店/酒吧
+Nightclub & Bar
+婚礼/活动
+Wedding & Events
+建筑亮化
+Architectural Lighting
+DJ/派对
+DJ & Party
+3. B2C 功能需求 / B2C Features
+模块
+功能点
+优先级
+商品展示
+产品列表页（分类筛选：类型/功率/场景/价格）
+P0
+产品详情页（图片画廊、参数表、视频、下载中心）
+P0
+产品对比功能
+P1
+关联推荐/搭配购买
+P2
+购物车
+标准购物车流程（加购→购物车→结算→支付）
+P0
+运费自动计算（按重量/体积/目的地）
+P0
+税费处理（按地区自动计算 VAT/GST）
+P1
+支付
+PayPal / 信用卡（Stripe）
+P0
+用户中心
+注册/登录（邮箱 + 社交登录）
+P0
+订单查询、物流追踪
+P0
+收藏夹/愿望清单
+P2
+4. B2B 引流功能 / B2B Lead Generation
+模块
+功能点
+优先级
+B2B入口
+导航栏 "For Business / Bulk Order" 入口
+P0
+产品详情页 "Request Bulk Quote" 按钮
+P0
+询盘表单
+留资表单：公司名、联系人、邮箱、电话、国家、产品/数量、项目描述
+P0
+表单支持多产品选择 + 上传需求文档
+P1
+提交后自动邮件通知（销售团队 + 客户确认）
+P0
+B2B内容
+OEM/ODM 定制服务介绍页
+P1
+工程案例/项目展示页
+P1
+下载中心（产品手册、认证证书、IES文件）
+P1
+信任背书
+客户 Logo 墙（合作品牌/活动）
+P1
+认证展示（CE/RoHS/FCC/UL 等）
+P1
+5. 页面结构 / Site Structure
+Home
+├── Products (Stage Lighting / Control / Structure / Effects / Cables)
+├── Solutions (Concert / Theater / TV Studio / Nightclub / Wedding / Architectural)
+├── Projects (Case Studies)
+├── For Business (B2B Quote / OEM-ODM / Downloads)
+├── About Us
+├── Blog / News
+└── Contact
+6. 视觉设计方案 / Visual Design
+6.1 配色方案
+用途
+颜色
+色值
+主背景
+深黑/深灰
+#0D0D0D / #1A1A1A
+卡片背景
+稍浅灰
+#222222 / #2A2A2A
+主强调色
+霓虹蓝/紫
+#00D4FF / #7B2FFF
+次强调色
+亮白
+#FFFFFF
+CTA按钮
+蓝紫渐变
+#00D4FF → #7B2FFF
+正文文字
+白色/浅灰
+#FFFFFF / #B0B0B0
+6.2 首页布局
+Hero Banner (Full-screen video/animation) → Hot Products → Category Grid → Solutions → Projects → Why Choose Us → Partner Logos → Blog → Newsletter → Footer
+7. 营销 & SEO / Marketing & SEO
+模块
+功能点
+优先级
+SEO
+页面 SEO 优化（meta title/description、结构化数据）
+P0
+Blog/新闻板块（内容营销）
+P1
+产品 Schema Markup（Google Shopping）
+P1
+社媒
+Instagram/Facebook/TikTok/YouTube 集成
+P1
+转化
+WhatsApp / Live Chat 在线客服
+P0
+Newsletter 订阅弹窗
+P2
+追踪
+Google Analytics / Meta Pixel / Google Ads 转化追踪
+P1
+8. 技术方案 / Tech Stack
+类别
+推荐方案
+说明
+主题
+Astra / Flavor
+轻量快速，支持 Elementor
+页面构建
+Elementor Pro
+拖拽建站，灵活度高
+电商
+WooCommerce
+WordPress 电商标准方案
+B2B询盘
+WooCommerce Quote / WPForms
+询盘表单 + 邮件通知
+SEO
+Rank Math / Yoast SEO
+页面 SEO + Schema
+性能
+WP Rocket / LiteSpeed Cache
+缓存 + CDN
+安全
+Wordfence
+防护 + 备份
+客服
+Tawk.to / Tidio
+免费在线客服
+9. 内容需求清单 / Content Requirements
+内容
+状态
+说明
+品牌名称 & Logo
+待确认
+需要确定品牌名和 Logo
+域名
+待注册
+建议使用 .com 域名
+产品图片/视频
+已有
+白底图 + 场景图 + 视频
+产品参数/说明书
+已有
+需整理为结构化表格 + PDF
+品牌故事/公司介绍
+待撰写
+用于 About Us 页面
+工程案例
+待整理
+图片 + 项目描述 + 使用产品
+认证证书
+待整理
+CE/FCC/UL 等扫描件
+收款账户
+待开通
+PayPal Business + Stripe
+物流方案
+待确定
+海外仓/直邮/运费模板
+服务器/主机
+待选择
+SiteGround / Cloudways
+10. 实施阶段 / Implementation Phases
+阶段
+内容
+周期
+Phase 1
+基础网站搭建 + 核心产品上架 + 支付 + 询盘功能
+2-4 周
+Phase 2
+全部产品上架 + 解决方案页 + 案例页 + Blog
+2-3 周
+Phase 3
+SEO 优化 + 广告投放 + 社媒集成 + 数据追踪
+持续
+11. Blog 内容方向 / Blog Content Strategy
+11.1 内容类型与示例标题
+内容类型
+示例标题
+选购指南
+How to Choose the Right Moving Head Light for Your Venue
+技术科普
+DMX512 vs DMX512-A: What's the Difference?
+案例故事
+How We Lit Up the XYZ Music Festival
+行业趋势
+Top 5 Stage Lighting Trends in 2026
+安装教程
+Step-by-Step Guide: Setting Up DMX Lighting for a Small Venue
+12. B2B 询盘表单设计 / B2B Quote Form
+表单字段：
+• Full Name *
+• Company Name *
+• Email Address *
+• Phone Number
+• Country *
+• Interested Product(s) * (下拉多选/搜索选择)
+• Estimated Quantity * (下拉: 10-50/50-100/100-500/500+)
+• Project Description * (多行文本)
+• Upload File (optional) - 拖拽上传区域
+
+侧边栏：
+• WhatsApp/Email 联系方式
+• 24h 响应承诺
+• 信任标识（认证/质保/出货）
+--- End of Document ---

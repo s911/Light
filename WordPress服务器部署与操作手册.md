@@ -75,6 +75,7 @@
 - 备份：`UpdraftPlus`
 - 表单：`WPForms Pro`
 - 客服：`Tawk.to` / `Tidio`
+- 社交登录：`Nextend Social Login`（Google / Facebook）
 
 ---
 
@@ -121,6 +122,30 @@ curl -x http://10.144.1.10:8080 -O https://wordpress.org/latest.zip
 - 税费：按目标市场配置 VAT/GST
 - 邮件模板：统一品牌风格，配置发件域名 SPF/DKIM
 
+推荐一键基线脚本（已内置）：
+
+```bash
+# 调试环境
+bash scripts/wp-configure-commerce-rules.sh
+
+# 生产环境
+bash scripts/wp-configure-commerce-rules.sh --prod
+
+# 指定规则模板（可选）
+bash scripts/wp-configure-commerce-rules.sh --rules config/commerce-rules.prod.json
+```
+
+脚本会自动：
+
+- 开启税费计算
+- 同步运费分区（US / Europe / Asia Pacific）
+- 设置基础运费规则（Flat Rate + Free Shipping）
+- 写入基础税率（EU VAT / UK VAT / AU GST / SG GST）
+- 自动按环境读取规则：
+  - `config/commerce-rules.debug.json`
+  - `config/commerce-rules.prod.json`
+- 也可通过 `--rules` 指定自定义规则文件
+
 ## 5.3 B2B 询盘配置
 
 - 导航增加 `For Business / Bulk Order`
@@ -138,6 +163,10 @@ curl -x http://10.144.1.10:8080 -O https://wordpress.org/latest.zip
 - 通知规则：
   - 提交后发给销售组邮箱
   - 自动回执给客户邮箱
+  - 每日自动发送“超期线索提醒邮件”（WP-Cron）
+- 管理入口：
+  - `Settings -> Stage B2B Settings` 可手动点击 `Send Reminder Now` 立即发送提醒
+  - `B2B Leads` 列表中 `Overdue` 列用于快速识别超期线索
 
 ---
 
@@ -149,10 +178,33 @@ curl -x http://10.144.1.10:8080 -O https://wordpress.org/latest.zip
 - [ ] 运费与税费计算正确
 - [ ] B2B 表单可提交，附件可接收
 - [ ] 邮件通知正常（管理员 + 客户）
+- [ ] 社交登录（Google/Facebook）配置完成并可用
+- [ ] 社交登录 OAuth 回调域名与站点域名一致
+- [ ] Live Chat（Tawk/Tidio/Custom）已配置并可触发
 - [ ] HTTPS 生效，无混合内容告警
 - [ ] SEO 基础项完成（Title/Description/Sitemap/Robots）
 - [ ] GA4 与 Meta Pixel 已埋点并验证
 - [ ] 全站备份与回滚测试完成
+
+### 6.1 自动验收脚本（推荐）
+
+上线前建议执行：
+
+```bash
+# 调试环境
+bash scripts/site-audit.sh
+
+# 生产环境
+bash scripts/site-audit.sh --prod
+```
+
+脚本会检查：
+
+- 主题、关键插件、关键页面、菜单绑定
+- WooCommerce 运费/税费基础配置
+- 社交登录插件激活与基础配置
+- 社交登录回调域名一致性（`[WARN]` 为提示，不阻塞）
+- Live Chat 配置状态
 
 ---
 
@@ -163,6 +215,7 @@ curl -x http://10.144.1.10:8080 -O https://wordpress.org/latest.zip
 - 检查订单状态、支付异常、邮件队列。
 - 检查安全告警（Wordfence、主机监控、CDN 告警）。
 - 处理 B2B 询盘并登记跟进状态。
+- 检查是否收到“超期线索提醒邮件”；若未收到，可在 `Stage B2B Settings` 手动触发一次验证。
 
 ## 7.2 每周
 

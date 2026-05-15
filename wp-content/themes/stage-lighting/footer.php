@@ -30,6 +30,17 @@ $stage_whatsapp_number = function_exists('stage_b2b_get_whatsapp_number') ? stag
                 )
             );
             ?>
+            <?php
+            if (function_exists('stage_marketing_social_links')) {
+                stage_marketing_social_links(true);
+            }
+            ?>
+            <div class="payment-icons">
+                <span>PayPal</span>
+                <span>Visa</span>
+                <span>Mastercard</span>
+                <span>Stripe</span>
+            </div>
         </div>
     </div>
 </footer>

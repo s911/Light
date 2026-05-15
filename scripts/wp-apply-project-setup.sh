@@ -37,8 +37,31 @@ fi
 
 echo ">> Activating required theme/plugins..."
 "${WP_CMD[@]}" theme activate stage-lighting || true
+
+echo ">> Ensuring WooCommerce is installed and active..."
+if ! "${WP_CMD[@]}" plugin is-installed woocommerce >/dev/null 2>&1; then
+  if ! "${WP_CMD[@]}" plugin install woocommerce --activate; then
+    echo "Warning: failed to install WooCommerce automatically."
+    echo "Please install it manually in WP Admin -> Plugins -> Add New -> WooCommerce."
+  fi
+else
+  "${WP_CMD[@]}" plugin activate woocommerce || true
+fi
+
 "${WP_CMD[@]}" plugin activate stage-lighting-b2b || true
 "${WP_CMD[@]}" plugin activate stage-lighting-setup || true
+"${WP_CMD[@]}" plugin activate stage-lighting-importer || true
+"${WP_CMD[@]}" plugin activate stage-lighting-marketing || true
+
+echo ">> Ensuring social login plugin is installed and active..."
+if ! "${WP_CMD[@]}" plugin is-installed nextend-facebook-connect >/dev/null 2>&1; then
+  if ! "${WP_CMD[@]}" plugin install nextend-facebook-connect --activate; then
+    echo "Warning: failed to install Nextend Social Login automatically."
+    echo "Please install it manually in WP Admin -> Plugins -> Add New -> Nextend Social Login."
+  fi
+else
+  "${WP_CMD[@]}" plugin activate nextend-facebook-connect || true
+fi
 
 echo ">> Running one-click initializer..."
 "${WP_CMD[@]}" eval "if (function_exists('stage_setup_run_initializer')) { stage_setup_run_initializer(); echo 'Initializer done'; } else { echo 'Initializer not found'; }"

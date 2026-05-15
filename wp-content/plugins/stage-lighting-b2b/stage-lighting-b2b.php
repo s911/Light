@@ -75,9 +75,25 @@ function stage_b2b_render_settings_page() {
         return;
     }
     $settings = stage_b2b_get_settings();
+    $manual_notice = '';
+    if (
+        isset($_POST['stage_b2b_send_overdue_now'])
+        && isset($_POST['stage_b2b_overdue_nonce'])
+        && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['stage_b2b_overdue_nonce'])), 'stage_b2b_send_overdue_now')
+    ) {
+        $result = stage_b2b_send_overdue_digest(true);
+        if (!empty($result['sent'])) {
+            $manual_notice = sprintf('Reminder email sent. Overdue leads in digest: %d.', (int) $result['count']);
+        } else {
+            $manual_notice = sprintf('No reminder email sent: %s', (string) ($result['reason'] ?? 'unknown'));
+        }
+    }
     ?>
     <div class="wrap">
         <h1>Stage B2B Settings</h1>
+        <?php if (!empty($manual_notice)) : ?>
+            <div class="notice notice-info"><p><?php echo esc_html($manual_notice); ?></p></div>
+        <?php endif; ?>
         <form method="post" action="options.php">
             <?php settings_fields('stage_b2b_settings_group'); ?>
             <table class="form-table" role="presentation">
@@ -96,6 +112,13 @@ function stage_b2b_render_settings_page() {
                 </tr>
             </table>
             <?php submit_button('Save Settings'); ?>
+        </form>
+        <hr>
+        <h2>Overdue Lead Reminder</h2>
+        <p>Daily digest is sent automatically to Sales Email for overdue leads.</p>
+        <form method="post">
+            <?php wp_nonce_field('stage_b2b_send_overdue_now', 'stage_b2b_overdue_nonce'); ?>
+            <p><button class="button button-secondary" type="submit" name="stage_b2b_send_overdue_now" value="1">Send Reminder Now</button></p>
         </form>
     </div>
     <?php
@@ -131,6 +154,104 @@ function stage_b2b_get_status_labels() {
         'lost'      => 'Lost',
     );
 }
+
+function stage_b2b_get_overdue_leads($limit = 100) {
+    $today = wp_date('Y-m-d', current_time('timestamp'));
+    $query = new WP_Query(
+        array(
+            'post_type'      => 'stage_b2b_lead',
+            'post_status'    => 'publish',
+            'posts_per_page' => max(1, (int) $limit),
+            'orderby'        => 'meta_value',
+            'meta_key'       => 'follow_up_date',
+            'order'          => 'ASC',
+            'meta_query'     => array(
+                'relation' => 'AND',
+                array(
+                    'key'     => 'follow_up_date',
+                    'value'   => $today,
+                    'compare' => '<',
+                    'type'    => 'DATE',
+                ),
+                array(
+                    'key'     => 'lead_status',
+                    'value'   => array('won', 'lost'),
+                    'compare' => 'NOT IN',
+                ),
+            ),
+        )
+    );
+    return $query->posts;
+}
+
+function stage_b2b_send_overdue_digest($force = false) {
+    $today = wp_date('Y-m-d', current_time('timestamp'));
+    $last_sent = (string) get_option('stage_b2b_last_digest_date', '');
+    if (!$force && $last_sent === $today) {
+        return array('sent' => false, 'reason' => 'already_sent_today', 'count' => 0);
+    }
+
+    $overdue = stage_b2b_get_overdue_leads(120);
+    if (empty($overdue)) {
+        return array('sent' => false, 'reason' => 'no_overdue_leads', 'count' => 0);
+    }
+
+    $to = stage_b2b_get_sales_email();
+    if (empty($to) || !is_email($to)) {
+        return array('sent' => false, 'reason' => 'invalid_sales_email', 'count' => count($overdue));
+    }
+
+    $subject = sprintf('[Stage B2B] Overdue Leads Reminder (%s)', $today);
+    $body = "Daily overdue lead reminder.\n\n";
+    $body .= sprintf("Total overdue leads: %d\n\n", count($overdue));
+    $body .= "Leads:\n";
+
+    foreach ($overdue as $lead) {
+        $lead_id = (int) $lead->ID;
+        $company = (string) get_post_meta($lead_id, 'company_name', true);
+        $name = (string) get_post_meta($lead_id, 'full_name', true);
+        $email = (string) get_post_meta($lead_id, 'email', true);
+        $status = (string) get_post_meta($lead_id, 'lead_status', true);
+        $follow_up = (string) get_post_meta($lead_id, 'follow_up_date', true);
+        $edit_url = admin_url('post.php?post=' . $lead_id . '&action=edit');
+        $body .= sprintf(
+            "- #%d | %s | %s | %s | status=%s | follow_up=%s\n  %s\n",
+            $lead_id,
+            $company,
+            $name,
+            $email,
+            $status,
+            $follow_up,
+            $edit_url
+        );
+    }
+
+    $sent = wp_mail($to, $subject, $body);
+    if ($sent) {
+        update_option('stage_b2b_last_digest_date', $today, false);
+        return array('sent' => true, 'reason' => 'ok', 'count' => count($overdue));
+    }
+
+    return array('sent' => false, 'reason' => 'wp_mail_failed', 'count' => count($overdue));
+}
+
+function stage_b2b_daily_digest_cron_handler() {
+    stage_b2b_send_overdue_digest(false);
+}
+add_action('stage_b2b_daily_digest_event', 'stage_b2b_daily_digest_cron_handler');
+
+function stage_b2b_maybe_schedule_daily_digest() {
+    if (wp_next_scheduled('stage_b2b_daily_digest_event')) {
+        return;
+    }
+    wp_schedule_event(time() + 300, 'daily', 'stage_b2b_daily_digest_event');
+}
+add_action('init', 'stage_b2b_maybe_schedule_daily_digest');
+
+function stage_b2b_cleanup_cron_on_deactivate() {
+    wp_clear_scheduled_hook('stage_b2b_daily_digest_event');
+}
+register_deactivation_hook(__FILE__, 'stage_b2b_cleanup_cron_on_deactivate');
 
 function stage_b2b_create_lead($data) {
     $lead_id = wp_insert_post(
@@ -478,10 +599,87 @@ function stage_b2b_get_for_business_url() {
     return home_url('/for-business');
 }
 
+function stage_b2b_get_client_ip() {
+    $keys = array('HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR');
+    foreach ($keys as $key) {
+        if (!empty($_SERVER[$key])) {
+            $raw = sanitize_text_field(wp_unslash($_SERVER[$key]));
+            $ip = trim(explode(',', $raw)[0]);
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
+    }
+    return 'unknown';
+}
+
+function stage_b2b_rate_limit_check() {
+    $ip = stage_b2b_get_client_ip();
+    $bucket = 'stage_b2b_rate_' . md5($ip);
+    $state = get_transient($bucket);
+    if (!is_array($state)) {
+        $state = array('last' => 0, 'count' => 0);
+    }
+    $now = time();
+    if ($state['last'] > 0 && ($now - (int) $state['last']) < 20) {
+        return new WP_Error('rate_limit', 'Please wait before submitting again.');
+    }
+    if ((int) $state['count'] >= 20) {
+        return new WP_Error('rate_limit_hour', 'Too many requests from this network. Try again later.');
+    }
+    $state['last'] = $now;
+    $state['count'] = (int) $state['count'] + 1;
+    set_transient($bucket, $state, HOUR_IN_SECONDS);
+    return true;
+}
+
+function stage_b2b_get_product_name_options($limit = 60) {
+    if (!post_type_exists('product')) {
+        return array();
+    }
+    $query = new WP_Query(
+        array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'posts_per_page' => max(1, (int) $limit),
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+            'fields'         => 'ids',
+        )
+    );
+    if (empty($query->posts)) {
+        return array();
+    }
+    $names = array();
+    foreach ($query->posts as $product_id) {
+        $name = get_the_title((int) $product_id);
+        if (!empty($name)) {
+            $names[] = (string) $name;
+        }
+    }
+    return array_values(array_unique($names));
+}
+
+function stage_b2b_split_products_text($text) {
+    $parts = preg_split('/\s*[,|\n]\s*/', (string) $text);
+    if (!is_array($parts)) {
+        return array();
+    }
+    $clean = array();
+    foreach ($parts as $part) {
+        $item = sanitize_text_field(trim((string) $part));
+        if (!empty($item)) {
+            $clean[] = $item;
+        }
+    }
+    return array_values(array_unique($clean));
+}
+
 function stage_b2b_quote_form_shortcode() {
     $notice = '';
     $error  = '';
     $prefill_product = '';
+    $product_options = stage_b2b_get_product_name_options(80);
 
     if (isset($_GET['product'])) {
         $prefill_product = sanitize_text_field(wp_unslash($_GET['product']));
@@ -491,18 +689,46 @@ function stage_b2b_quote_form_shortcode() {
         if (!isset($_POST['stage_quote_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['stage_quote_nonce'])), 'stage_quote_submit')) {
             $error = __('Security check failed. Please refresh and try again.', 'stage-lighting');
         } else {
+            $honeypot = sanitize_text_field(wp_unslash($_POST['website'] ?? ''));
+            if (!empty($honeypot)) {
+                $error = __('Submission rejected.', 'stage-lighting');
+            }
+            if (empty($error)) {
+                $rate_check = stage_b2b_rate_limit_check();
+                if (is_wp_error($rate_check)) {
+                    $error = __($rate_check->get_error_message(), 'stage-lighting');
+                }
+            }
+
             $full_name      = sanitize_text_field(wp_unslash($_POST['full_name'] ?? ''));
             $company        = sanitize_text_field(wp_unslash($_POST['company_name'] ?? ''));
             $email          = sanitize_email(wp_unslash($_POST['email'] ?? ''));
             $phone          = sanitize_text_field(wp_unslash($_POST['phone'] ?? ''));
             $country        = sanitize_text_field(wp_unslash($_POST['country'] ?? ''));
             $products       = sanitize_text_field(wp_unslash($_POST['interested_products'] ?? ''));
+            $products_manual = sanitize_text_field(wp_unslash($_POST['interested_products_manual'] ?? ''));
+            $products_selected_raw = isset($_POST['interested_products_list']) ? wp_unslash($_POST['interested_products_list']) : array();
+            $products_selected = array();
+            if (is_array($products_selected_raw)) {
+                foreach ($products_selected_raw as $item) {
+                    $item = sanitize_text_field((string) $item);
+                    if (!empty($item)) {
+                        $products_selected[] = $item;
+                    }
+                }
+            }
+            $products_parts = array_merge(stage_b2b_split_products_text($products_manual), $products_selected);
+            if (!empty($products_parts)) {
+                $products = implode(', ', array_values(array_unique($products_parts)));
+            }
             $quantity       = sanitize_text_field(wp_unslash($_POST['estimated_quantity'] ?? ''));
             $project        = sanitize_textarea_field(wp_unslash($_POST['project_description'] ?? ''));
             $attachment     = '';
             $attachment_url = '';
 
-            if (empty($full_name) || empty($company) || empty($email) || empty($country) || empty($products) || empty($quantity) || empty($project)) {
+            if (!empty($error)) {
+                // noop: error already set by anti-spam checks.
+            } elseif (empty($full_name) || empty($company) || empty($email) || empty($country) || empty($products) || empty($quantity) || empty($project)) {
                 $error = __('Please fill all required fields.', 'stage-lighting');
             } elseif (!is_email($email)) {
                 $error = __('Please enter a valid email address.', 'stage-lighting');
@@ -564,6 +790,7 @@ function stage_b2b_quote_form_shortcode() {
     ob_start();
     if (!empty($notice)) {
         echo '<div class="stage-form-success">' . esc_html($notice) . '</div>';
+        echo "<script>if (typeof window.stageTrackAdsConversion === 'function') { window.stageTrackAdsConversion(1.0, 'USD'); }</script>";
     }
     if (!empty($error)) {
         echo '<div class="stage-form-error">' . esc_html($error) . '</div>';
@@ -572,6 +799,7 @@ function stage_b2b_quote_form_shortcode() {
     <div class="stage-quote-layout">
         <form class="stage-quote-form stage-track-quote-form" method="post" enctype="multipart/form-data">
             <?php wp_nonce_field('stage_quote_submit', 'stage_quote_nonce'); ?>
+            <input type="text" name="website" value="" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;height:1px;width:1px;opacity:0;">
 
             <div>
                 <label for="full_name">Full Name *</label>
@@ -595,12 +823,40 @@ function stage_b2b_quote_form_shortcode() {
 
             <div>
                 <label for="country">Country *</label>
-                <input id="country" name="country" type="text" required>
+                <select id="country" name="country" required>
+                    <option value="">Please Select</option>
+                    <?php
+                    $country_options = array(
+                        'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Italy', 'Spain', 'Netherlands',
+                        'Australia', 'New Zealand', 'Singapore', 'Malaysia', 'Thailand', 'Philippines', 'Vietnam', 'Japan',
+                        'South Korea', 'United Arab Emirates', 'Saudi Arabia', 'South Africa', 'Other',
+                    );
+                    foreach ($country_options as $country_name) :
+                        ?>
+                        <option value="<?php echo esc_attr($country_name); ?>"><?php echo esc_html($country_name); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
             <div>
-                <label for="interested_products">Interested Product(s) *</label>
-                <input id="interested_products" name="interested_products" type="text" placeholder="e.g. Moving Head 350W, LED Par 18x10W" value="<?php echo esc_attr($prefill_product); ?>" required>
+                <label for="interested_products_manual">Interested Product(s) *</label>
+                <input id="interested_products" name="interested_products" type="hidden" value="">
+                <input id="interested_products_manual" name="interested_products_manual" type="text" placeholder="Type product names, separated by comma" value="<?php echo esc_attr($prefill_product); ?>" autocomplete="off">
+                <?php if (!empty($product_options)) : ?>
+                    <div class="stage-product-picker">
+                        <label for="interested_products_search">Quick Select (multi-select + search)</label>
+                        <input id="interested_products_search" type="search" placeholder="Search products...">
+                        <div class="stage-product-picker-list" id="stage-product-picker-list">
+                            <?php foreach ($product_options as $option_name) : ?>
+                                <?php $is_checked = (!empty($prefill_product) && strtolower($prefill_product) === strtolower($option_name)); ?>
+                                <label class="stage-product-option">
+                                    <input type="checkbox" name="interested_products_list[]" value="<?php echo esc_attr($option_name); ?>" <?php checked($is_checked); ?>>
+                                    <span><?php echo esc_html($option_name); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div>
@@ -621,7 +877,11 @@ function stage_b2b_quote_form_shortcode() {
 
             <div>
                 <label for="request_file">Upload File (optional)</label>
-                <input id="request_file" name="request_file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip">
+                <div id="stage-dropzone" class="stage-dropzone" tabindex="0">
+                    <p>Drag and drop a file here, or click to choose.</p>
+                    <small id="stage-dropzone-name">No file selected</small>
+                </div>
+                <input id="request_file" name="request_file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.png,.jpg,.jpeg,.webp" style="display:none;">
             </div>
 
             <div>
@@ -639,6 +899,101 @@ function stage_b2b_quote_form_shortcode() {
             </ul>
         </aside>
     </div>
+    <script>
+    (function () {
+        var form = document.querySelector(".stage-quote-form");
+        if (!form) {
+            return;
+        }
+        var hiddenProducts = form.querySelector("#interested_products");
+        var manualProducts = form.querySelector("#interested_products_manual");
+        var listSelector = 'input[name="interested_products_list[]"]';
+        var pickerSearch = form.querySelector("#interested_products_search");
+        var pickerList = form.querySelector("#stage-product-picker-list");
+        var fileInput = form.querySelector("#request_file");
+        var dropzone = form.querySelector("#stage-dropzone");
+        var dropzoneName = form.querySelector("#stage-dropzone-name");
+
+        function splitProducts(text) {
+            if (!text) {
+                return [];
+            }
+            return text.split(/[,\n|]/).map(function (item) {
+                return item.trim();
+            }).filter(Boolean);
+        }
+
+        function buildProductsValue() {
+            var values = [];
+            splitProducts(manualProducts ? manualProducts.value : "").forEach(function (item) {
+                values.push(item);
+            });
+            form.querySelectorAll(listSelector).forEach(function (checkbox) {
+                if (checkbox.checked && checkbox.value) {
+                    values.push(checkbox.value.trim());
+                }
+            });
+            var unique = Array.from(new Set(values));
+            if (hiddenProducts) {
+                hiddenProducts.value = unique.join(", ");
+            }
+            if (manualProducts) {
+                if (unique.length === 0) {
+                    manualProducts.setCustomValidity("Please choose at least one product.");
+                } else {
+                    manualProducts.setCustomValidity("");
+                }
+            }
+        }
+
+        if (pickerSearch && pickerList) {
+            pickerSearch.addEventListener("input", function () {
+                var keyword = pickerSearch.value.toLowerCase().trim();
+                pickerList.querySelectorAll(".stage-product-option").forEach(function (row) {
+                    var text = row.textContent.toLowerCase();
+                    row.style.display = (!keyword || text.indexOf(keyword) !== -1) ? "" : "none";
+                });
+            });
+        }
+
+        if (dropzone && fileInput) {
+            var updateName = function () {
+                if (!dropzoneName) {
+                    return;
+                }
+                dropzoneName.textContent = (fileInput.files && fileInput.files[0]) ? fileInput.files[0].name : "No file selected";
+            };
+            dropzone.addEventListener("click", function () {
+                fileInput.click();
+            });
+            dropzone.addEventListener("keydown", function (evt) {
+                if (evt.key === "Enter" || evt.key === " ") {
+                    evt.preventDefault();
+                    fileInput.click();
+                }
+            });
+            fileInput.addEventListener("change", updateName);
+            dropzone.addEventListener("dragover", function (evt) {
+                evt.preventDefault();
+                dropzone.classList.add("is-dragover");
+            });
+            dropzone.addEventListener("dragleave", function () {
+                dropzone.classList.remove("is-dragover");
+            });
+            dropzone.addEventListener("drop", function (evt) {
+                evt.preventDefault();
+                dropzone.classList.remove("is-dragover");
+                if (evt.dataTransfer && evt.dataTransfer.files && evt.dataTransfer.files.length > 0) {
+                    fileInput.files = evt.dataTransfer.files;
+                    updateName();
+                }
+            });
+        }
+
+        form.addEventListener("submit", buildProductsValue);
+        buildProductsValue();
+    })();
+    </script>
     <?php
     return ob_get_clean();
 }

@@ -22,7 +22,7 @@ services:
       retries: 10
 
   wordpress:
-    image: wordpress:6.5-php8.2-apache
+    image: wordpress:6.8-php8.2-apache
     container_name: stage-lighting-wp
     restart: unless-stopped
     depends_on:
@@ -41,6 +41,8 @@ services:
       - ./wp-content/themes/stage-lighting:/var/www/html/wp-content/themes/stage-lighting
       - ./wp-content/plugins/stage-lighting-b2b:/var/www/html/wp-content/plugins/stage-lighting-b2b
       - ./wp-content/plugins/stage-lighting-setup:/var/www/html/wp-content/plugins/stage-lighting-setup
+      - ./wp-content/plugins/stage-lighting-importer:/var/www/html/wp-content/plugins/stage-lighting-importer
+      - ./wp-content/plugins/stage-lighting-marketing:/var/www/html/wp-content/plugins/stage-lighting-marketing
       - wp_data:/var/www/html
 
   wpcli:
@@ -62,6 +64,8 @@ services:
       - ./wp-content/themes/stage-lighting:/var/www/html/wp-content/themes/stage-lighting
       - ./wp-content/plugins/stage-lighting-b2b:/var/www/html/wp-content/plugins/stage-lighting-b2b
       - ./wp-content/plugins/stage-lighting-setup:/var/www/html/wp-content/plugins/stage-lighting-setup
+      - ./wp-content/plugins/stage-lighting-importer:/var/www/html/wp-content/plugins/stage-lighting-importer
+      - ./wp-content/plugins/stage-lighting-marketing:/var/www/html/wp-content/plugins/stage-lighting-marketing
       - wp_data:/var/www/html
     entrypoint: ["sleep", "infinity"]
 

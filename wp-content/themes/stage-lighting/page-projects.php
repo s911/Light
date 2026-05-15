@@ -20,10 +20,21 @@ $projects = new WP_Query(
         <div class="grid grid-3">
             <?php if ($projects->have_posts()) : ?>
                 <?php while ($projects->have_posts()) : $projects->the_post(); ?>
+                    <?php
+                    $client = (string) get_post_meta(get_the_ID(), 'project_client', true);
+                    $venue = (string) get_post_meta(get_the_ID(), 'project_venue_type', true);
+                    $country = (string) get_post_meta(get_the_ID(), 'project_country', true);
+                    ?>
                     <article class="card project-card">
                         <div>
                             <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
                             <p><?php echo esc_html(wp_trim_words(get_the_excerpt(), 22)); ?></p>
+                            <p><small>
+                                <?php
+                                $bits = array_filter(array($client, $venue, $country));
+                                echo esc_html(!empty($bits) ? implode(' | ', $bits) : 'Structured details pending');
+                                ?>
+                            </small></p>
                         </div>
                         <a class="btn btn-outline" href="<?php the_permalink(); ?>">Read Case</a>
                     </article>

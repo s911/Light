@@ -1,0 +1,73 @@
+{
+  "shipping_zones": [
+    {
+      "name": "United States",
+      "countries": ["US"],
+      "methods": [
+        {
+          "id": "flat_rate",
+          "settings": {
+            "title": "Standard Shipping",
+            "cost": "35"
+          }
+        },
+        {
+          "id": "free_shipping",
+          "settings": {
+            "title": "Free Shipping",
+            "requires": "min_amount",
+            "min_amount": "999"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Europe",
+      "countries": ["DE", "FR", "IT", "ES", "NL", "BE", "PL", "SE", "AT", "DK", "FI", "IE", "PT", "CZ", "HU", "RO"],
+      "methods": [
+        {
+          "id": "flat_rate",
+          "settings": {
+            "title": "Standard Shipping",
+            "cost": "55"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Asia Pacific",
+      "countries": ["AU", "SG", "MY", "TH", "PH", "VN", "JP", "KR", "NZ", "ID"],
+      "methods": [
+        {
+          "id": "flat_rate",
+          "settings": {
+            "title": "Standard Shipping",
+            "cost": "65"
+          }
+        }
+      ]
+    }
+  ],
+  "tax_rates": [
+    {
+      "name": "EU VAT",
+      "rate": "20.0000",
+      "countries": ["DE", "FR", "IT", "ES", "NL", "BE", "PL", "SE", "AT", "DK", "FI", "IE", "PT", "CZ", "HU", "RO"]
+    },
+    {
+      "name": "UK VAT",
+      "rate": "20.0000",
+      "countries": ["GB"]
+    },
+    {
+      "name": "AU GST",
+      "rate": "10.0000",
+      "countries": ["AU"]
+    },
+    {
+      "name": "SG GST",
+      "rate": "8.0000",
+      "countries": ["SG"]
+    }
+  ]
+}

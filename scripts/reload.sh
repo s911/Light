@@ -42,6 +42,14 @@ done
 
 cd "${PROJECT_DIR}"
 
+normalize_script_eol() {
+  local file="$1"
+  if [[ -f "${file}" ]]; then
+    sed -i 's/\r$//' "${file}" || true
+    chmod +x "${file}" || true
+  fi
+}
+
 ensure_env_file() {
   if [[ -f ".env" ]]; then
     return
@@ -77,6 +85,11 @@ fi
 echo "=== Stage Lighting Reload ==="
 echo "Mode: ${MODE}"
 echo "Rebuild: ${REBUILD}"
+normalize_script_eol "scripts/reload.sh"
+normalize_script_eol "scripts/wp-apply-project-setup.sh"
+normalize_script_eol "scripts/debian-one-click-deploy.sh"
+normalize_script_eol "scripts/site-audit.sh"
+normalize_script_eol "scripts/wp-configure-commerce-rules.sh"
 ensure_env_file
 
 if [[ "${REBUILD}" == "true" ]]; then

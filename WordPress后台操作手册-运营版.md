@@ -15,6 +15,10 @@
 - 要求：
   - 必开强密码 + 2FA
   - 禁止共享管理员账号
+- 社交登录（Google/Facebook）：
+  - 插件：`Nextend Social Login`
+  - 配置路径：`Settings -> Nextend Social Login`
+  - 完成 OAuth 配置后，登录/注册页会显示社交登录按钮
 
 ---
 
@@ -39,6 +43,61 @@
 ---
 
 ## 3. 商品管理（WooCommerce）
+
+## 3.0 Excel 批量导入（动态参数）
+
+路径：`Tools -> Stage Product Importer`
+
+支持文件：
+
+- `.xlsx`（读取第一个工作表）
+- `.csv`
+
+列规范（常用）：
+
+- `name`（必填）
+- `sku`
+- `description`
+- `short_description`
+- `regular_price`
+- `sale_price`
+- `stock`
+- `categories`
+- `tags`
+- `download_links`
+- `download_items`（格式示例：`Manual::https://...|Certificate::https://...`）
+- `video_url`
+
+动态参数列（可无限扩展）：
+
+- 列名格式：`attr:参数名`
+- 示例：`attr:Power`、`attr:Beam Angle`、`attr:Control Protocol`
+- 一个单元格多个值可用逗号或 `|` 分隔
+
+说明：
+
+- 运营可以直接在 Excel 新增任意 `attr:*` 列，无需改代码。
+- 导入时可勾选“按 SKU 更新已有商品”。
+- 建议按“两步导入”执行：先点 `Preview Import`，确认数量后再点 `Confirm Import`。
+- 若有失败行，可下载 `Error CSV` 修正后重新导入。
+- 若要在前台按分组显示下载，优先使用 `download_items` 列。
+- 每次确认导入后会自动记录日志，路径：`Tools -> Stage Import Logs`（时间/操作人/文件/结果统计）。
+
+## 3.0.1 产品对比功能（P1）
+
+- 前台会显示 `Add Compare` 按钮（首页/产品列表/产品详情）。
+- 顶部导航显示 `Compare (N)` 数量。
+- 对比页面路径：`/product-compare`
+- 单次最多对比 4 个商品。
+
+## 3.0.2 愿望清单（Wishlist）
+
+- 前台会显示 `Add Wishlist` 按钮（首页/产品列表/产品详情）。
+- 顶部导航显示 `Wishlist (N)` 数量。
+- 愿望清单页面路径：`/wishlist`
+- 可在愿望清单页面一键移除或清空。
+- 登录用户的 Wishlist 会自动与账号同步（跨会话保留）。
+- 客户在 `My Account` 中可看到 `Wishlist` 入口。
 
 ## 3.1 新增商品
 
@@ -95,6 +154,7 @@
 7. 优先处理 `Overdue=YES` 的线索
 8. 运营在 CRM/表格中登记线索并分配负责人
 9. 24小时内首次回复
+10. 系统每日会自动发送超期线索提醒邮件到 Sales Email
 
 ## 4.4 联系方式配置（后台可改）
 
@@ -103,11 +163,27 @@
 - Sales Email（询盘收件邮箱）
 - WhatsApp Number（仅数字，含国家码）
 - WhatsApp Display Text（前台展示文案）
+- `Send Reminder Now`（手动立即发送一次超期线索提醒）
 
 说明：
 
 - 页脚联系方式与右下角 WhatsApp 浮动按钮会自动读取上述配置。
 - 建议上线前先完成此配置再做验收。
+
+## 4.5 营销设置（社媒/统计/订阅）
+
+路径：`Settings -> Stage Marketing Settings`
+
+- Instagram/Facebook/TikTok/YouTube 链接
+- GA4 Measurement ID
+- Meta Pixel ID
+- Newsletter Popup 开关
+- Live Chat（Tawk.to / Tidio / Custom Script）
+
+说明：
+
+- 订阅名单在后台 `Newsletter Subscribers` 菜单查看。
+- 前台页脚会展示已配置的社媒链接。
 
 ---
 
@@ -146,6 +222,11 @@
 - 样品政策：说明起订量与样品运费
 - 定制能力：OEM/ODM 支持范围
 
+## 6.3 订单追踪入口
+
+- 页面路径：`/order-tracking`
+- 页面使用 WooCommerce 标准追踪表单（订单号 + 下单邮箱）。
+
 ---
 
 ## 7. 内容运营节奏（SEO）
@@ -157,6 +238,13 @@
   - Tech Explainer
   - Case Study
   - Industry Trends
+
+## 8. 上线前验收（建议）
+
+- 执行：`bash scripts/site-audit.sh --prod`
+- 关注结果：
+  - `[FAIL]` 必须修复后再上线
+  - `[WARN]` 为提示项（如社交登录回调域名检查），建议人工确认
   - Installation Tutorial
 
 ---

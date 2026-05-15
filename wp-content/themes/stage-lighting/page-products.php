@@ -11,11 +11,13 @@ $power      = isset($_GET['power']) ? sanitize_text_field(wp_unslash($_GET['powe
 $min_price  = isset($_GET['min_price']) ? floatval(wp_unslash($_GET['min_price'])) : '';
 $max_price  = isset($_GET['max_price']) ? floatval(wp_unslash($_GET['max_price'])) : '';
 $sort       = isset($_GET['sort']) ? sanitize_text_field(wp_unslash($_GET['sort'])) : 'latest';
+$per_page   = isset($_GET['per_page']) ? (int) wp_unslash($_GET['per_page']) : 12;
+$per_page   = in_array($per_page, array(12, 24, 48), true) ? $per_page : 12;
 $paged      = max(1, (int) get_query_var('paged'));
 
 $args = array(
     'post_type'      => 'product',
-    'posts_per_page' => 12,
+    'posts_per_page' => $per_page,
     'post_status'    => 'publish',
     's'              => $search,
     'paged'          => $paged,
@@ -76,6 +78,14 @@ if ('price_asc' === $sort) {
     $args['meta_key'] = '_price';
     $args['orderby']  = 'meta_value_num';
     $args['order']    = 'DESC';
+} elseif ('sales_desc' === $sort) {
+    $args['meta_key'] = 'total_sales';
+    $args['orderby']  = 'meta_value_num';
+    $args['order']    = 'DESC';
+} elseif ('rating_desc' === $sort) {
+    $args['meta_key'] = '_wc_average_rating';
+    $args['orderby']  = 'meta_value_num';
+    $args['order']    = 'DESC';
 } else {
     $args['orderby'] = 'date';
     $args['order']   = 'DESC';
@@ -106,6 +116,16 @@ if (taxonomy_exists('pa_power')) {
 ?>
 <section class="section">
     <div class="container">
+        <?php
+        if (function_exists('stage_lighting_render_breadcrumb')) {
+            stage_lighting_render_breadcrumb(
+                array(
+                    array('label' => 'Home', 'url' => home_url('/')),
+                    array('label' => 'Products', 'url' => get_permalink()),
+                )
+            );
+        }
+        ?>
         <p class="eyebrow">Catalog</p>
         <h1>Products</h1>
         <p class="result-count">
@@ -145,6 +165,13 @@ if (taxonomy_exists('pa_power')) {
                 <option value="latest" <?php selected($sort, 'latest'); ?>>Latest</option>
                 <option value="price_asc" <?php selected($sort, 'price_asc'); ?>>Price: Low to High</option>
                 <option value="price_desc" <?php selected($sort, 'price_desc'); ?>>Price: High to Low</option>
+                <option value="sales_desc" <?php selected($sort, 'sales_desc'); ?>>Best Selling</option>
+                <option value="rating_desc" <?php selected($sort, 'rating_desc'); ?>>Top Rated</option>
+            </select>
+            <select name="per_page">
+                <option value="12" <?php selected($per_page, 12); ?>>12 / page</option>
+                <option value="24" <?php selected($per_page, 24); ?>>24 / page</option>
+                <option value="48" <?php selected($per_page, 48); ?>>48 / page</option>
             </select>
             <button class="btn btn-gradient" type="submit">Apply Filters</button>
             <a class="btn btn-outline filter-reset" href="<?php echo esc_url(get_permalink()); ?>">Reset</a>
@@ -158,9 +185,13 @@ if (taxonomy_exists('pa_power')) {
                             <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
                             <p><?php echo esc_html(wp_trim_words(get_the_excerpt(), 18)); ?></p>
                             <p class="product-price"><?php echo esc_html(get_post_meta(get_the_ID(), '_price', true)); ?> USD</p>
+                            <p>Rating: <?php echo esc_html((string) get_post_meta(get_the_ID(), '_wc_average_rating', true)); ?></p>
                         </div>
                         <div class="cta-row">
                             <a class="btn btn-outline" href="<?php the_permalink(); ?>">View Product</a>
+                            <a class="btn btn-outline" href="#" data-quick-view="1" data-product-title="<?php echo esc_attr(get_the_title()); ?>" data-product-url="<?php echo esc_url(get_permalink()); ?>" data-product-excerpt="<?php echo esc_attr(wp_trim_words(get_the_excerpt(), 28)); ?>">Quick View</a>
+                            <a class="btn btn-outline" href="#" data-compare-toggle="1" data-product-id="<?php echo esc_attr((string) get_the_ID()); ?>">Add Compare</a>
+                            <a class="btn btn-outline" href="#" data-wishlist-toggle="1" data-product-id="<?php echo esc_attr((string) get_the_ID()); ?>">Add Wishlist</a>
                             <a class="btn btn-gradient" href="<?php echo esc_url(home_url('/for-business/?product=' . rawurlencode(get_the_title()))); ?>">Request Quote</a>
                         </div>
                     </article>
@@ -180,6 +211,16 @@ if (taxonomy_exists('pa_power')) {
                 'type'      => 'array',
                 'prev_text' => 'Prev',
                 'next_text' => 'Next',
+                'add_args'  => array(
+                    's'         => $search,
+                    'category'  => $category,
+                    'solution'  => $solution,
+                    'power'     => $power,
+                    'min_price' => $min_price,
+                    'max_price' => $max_price,
+                    'sort'      => $sort,
+                    'per_page'  => $per_page,
+                ),
             )
         );
         if (!empty($pagination)) :
@@ -192,6 +233,45 @@ if (taxonomy_exists('pa_power')) {
         <?php endif; ?>
     </div>
 </section>
+<div class="quick-view-modal" id="quick-view-modal">
+    <div class="quick-view-card">
+        <button class="btn btn-outline quick-view-close" type="button" id="quick-view-close">Close</button>
+        <h3 id="quick-view-title"></h3>
+        <p id="quick-view-excerpt"></p>
+        <a class="btn btn-gradient" id="quick-view-link" href="#">View Product</a>
+    </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var modal = document.getElementById("quick-view-modal");
+    var closeBtn = document.getElementById("quick-view-close");
+    var title = document.getElementById("quick-view-title");
+    var excerpt = document.getElementById("quick-view-excerpt");
+    var link = document.getElementById("quick-view-link");
+    if (!modal || !closeBtn || !title || !excerpt || !link) {
+        return;
+    }
+    document.addEventListener("click", function (evt) {
+        var btn = evt.target.closest("[data-quick-view]");
+        if (!btn) {
+            return;
+        }
+        evt.preventDefault();
+        title.textContent = btn.getAttribute("data-product-title") || "";
+        excerpt.textContent = btn.getAttribute("data-product-excerpt") || "";
+        link.setAttribute("href", btn.getAttribute("data-product-url") || "#");
+        modal.classList.add("is-open");
+    });
+    closeBtn.addEventListener("click", function () {
+        modal.classList.remove("is-open");
+    });
+    modal.addEventListener("click", function (evt) {
+        if (evt.target === modal) {
+            modal.classList.remove("is-open");
+        }
+    });
+});
+</script>
 <?php
 get_footer();
 ?>

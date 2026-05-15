@@ -1,0 +1,833 @@
+舞台灯独立站 - 用户验收测试文档
+Stage Lighting E-commerce Website - UAT Document
+Version 1.0 | Pre-Deployment Testing
+文档信息 / Document Info
+项目
+内容
+项目名称
+舞台灯独立站 UAT 测试
+测试日期
+____________________
+测试人员
+____________________
+开发人员
+Cursor AI
+测试环境
+Staging / Pre-production
+浏览器
+Chrome / Firefox / Safari / Edge (最新版)
+设备
+Desktop (1920x1080) / Tablet (768x1024) / Mobile (375x667)
+测试说明 / Testing Legend
+优先级定义：
+• P0 - 阻塞性问题，必须修复才能上线
+• P1 - 重要功能，建议修复
+• P2 - 优化项，可后续迭代
+测试结果：□ Pass (通过)  □ Fail (失败)  □ N/A (不适用)
+备注栏：记录测试中发现的问题、截图编号、修复建议
+1. 首页测试 / Homepage Testing
+1.1 页面加载与视觉
+#
+测试项
+优先级
+结果
+备注
+1
+首页加载时间 < 3秒（首次访问）
+P0
+□ Pass  □ Fail
+2
+首页加载时间 < 1.5秒（缓存后）
+P0
+□ Pass  □ Fail
+3
+暗黑科技风配色正确显示（深黑背景 #0D0D0D）
+P0
+□ Pass  □ Fail
+4
+CTA按钮蓝紫渐变效果正常
+P0
+□ Pass  □ Fail
+5
+Hero Banner 视频/动画正常播放
+P0
+□ Pass  □ Fail
+6
+响应式布局：Desktop/Tablet/Mobile 显示正常
+P0
+□ Pass  □ Fail
+7
+无控制台报错（Console errors = 0）
+P1
+□ Pass  □ Fail
+1.2 导航与头部
+#
+测试项
+优先级
+结果
+备注
+1
+Logo 点击返回首页
+P0
+□ Pass  □ Fail
+2
+主导航菜单：Products / Solutions / Projects / B2B / About / Contact
+P0
+□ Pass  □ Fail
+3
+导航下拉菜单（如有）正常展开/收起
+P0
+□ Pass  □ Fail
+4
+搜索功能正常工作
+P0
+□ Pass  □ Fail
+5
+购物车图标显示当前商品数量
+P0
+□ Pass  □ Fail
+6
+移动端汉堡菜单正常展开/收起
+P0
+□ Pass  □ Fail
+7
+Sticky Header 滚动时固定顶部
+P1
+□ Pass  □ Fail
+1.3 首页内容区块
+#
+测试项
+优先级
+结果
+备注
+1
+Hero Banner 主标题/副标题文案正确
+P0
+□ Pass  □ Fail
+2
+Hero Banner CTA 按钮：Shop Now / Get Bulk Quote
+P0
+□ Pass  □ Fail
+3
+热销产品区块显示 4-8 个产品卡片
+P0
+□ Pass  □ Fail
+4
+产品卡片：图片/名称/价格/评分正确显示
+P0
+□ Pass  □ Fail
+5
+品类快捷入口（6个方块）点击跳转正确
+P0
+□ Pass  □ Fail
+6
+解决方案展示区块（3-4个场景卡片）
+P0
+□ Pass  □ Fail
+7
+工程案例精选区块
+P1
+□ Pass  □ Fail
+8
+为什么选择我们（4个优势图标）
+P0
+□ Pass  □ Fail
+9
+合作品牌 Logo 墙
+P1
+□ Pass  □ Fail
+10
+Blog 区块显示 3 篇文章卡片
+P1
+□ Pass  □ Fail
+11
+Newsletter 订阅表单
+P1
+□ Pass  □ Fail
+12
+Footer：联系方式/快速链接/社媒/支付图标
+P0
+□ Pass  □ Fail
+2. 产品页面测试 / Product Pages Testing
+2.1 产品列表页
+#
+测试项
+优先级
+结果
+备注
+1
+产品列表正确分页（每页 12/24/48 可选）
+P0
+□ Pass  □ Fail
+2
+分类筛选：按类型/功率/场景/价格
+P0
+□ Pass  □ Fail
+3
+排序功能：价格/新品/销量/评分
+P0
+□ Pass  □ Fail
+4
+面包屑导航正确显示
+P0
+□ Pass  □ Fail
+5
+产品卡片悬停效果正常
+P1
+□ Pass  □ Fail
+6
+快速查看（Quick View）功能
+P2
+□ Pass  □ Fail
+2.2 产品详情页
+#
+测试项
+优先级
+结果
+备注
+1
+产品图片画廊：主图 + 缩略图切换
+P0
+□ Pass  □ Fail
+2
+图片放大/灯箱效果
+P1
+□ Pass  □ Fail
+3
+产品视频正常播放
+P0
+□ Pass  □ Fail
+4
+产品名称/型号正确显示
+P0
+□ Pass  □ Fail
+5
+价格显示（零售价）
+P0
+□ Pass  □ Fail
+6
+库存状态显示（有货/缺货）
+P0
+□ Pass  □ Fail
+7
+[Add to Cart] 按钮功能正常
+P0
+□ Pass  □ Fail
+8
+[Request Bulk Quote] 按钮跳转询盘页
+P0
+□ Pass  □ Fail
+9
+数量选择器 +/- 功能
+P0
+□ Pass  □ Fail
+10
+Tab 1: 产品描述（卖点、应用场景）
+P0
+□ Pass  □ Fail
+11
+Tab 2: 详细参数表（功率/光源/通道/尺寸）
+P0
+□ Pass  □ Fail
+12
+Tab 3: 下载中心（说明书/认证/2D图纸）
+P1
+□ Pass  □ Fail
+13
+Tab 4: 相关配件/搭配推荐
+P1
+□ Pass  □ Fail
+14
+关联产品推荐区块
+P1
+□ Pass  □ Fail
+15
+产品分享按钮（社媒）
+P2
+□ Pass  □ Fail
+3. 购物车与结算 / Shopping Cart & Checkout
+3.1 购物车
+#
+测试项
+优先级
+结果
+备注
+1
+添加商品到购物车成功
+P0
+□ Pass  □ Fail
+2
+购物车迷你弹窗/侧边栏显示
+P0
+□ Pass  □ Fail
+3
+购物车页面商品列表正确显示
+P0
+□ Pass  □ Fail
+4
+修改商品数量 +/-
+P0
+□ Pass  □ Fail
+5
+删除商品
+P0
+□ Pass  □ Fail
+6
+小计/运费/税费/总计计算正确
+P0
+□ Pass  □ Fail
+7
+优惠码输入框
+P1
+□ Pass  □ Fail
+8
+[Continue Shopping] 按钮
+P1
+□ Pass  □ Fail
+9
+[Proceed to Checkout] 按钮
+P0
+□ Pass  □ Fail
+3.2 结算流程
+#
+测试项
+优先级
+结果
+备注
+1
+客户信息：邮箱（访客结账）
+P0
+□ Pass  □ Fail
+2
+配送地址：姓名/地址/城市/邮编/国家/电话
+P0
+□ Pass  □ Fail
+3
+地址自动补全（如有）
+P1
+□ Pass  □ Fail
+4
+运费自动计算（按重量/目的地）
+P0
+□ Pass  □ Fail
+5
+多种配送方式选择
+P0
+□ Pass  □ Fail
+6
+税费自动计算（VAT/GST）
+P0
+□ Pass  □ Fail
+7
+订单摘要正确显示
+P0
+□ Pass  □ Fail
+8
+支付方式：PayPal
+P0
+□ Pass  □ Fail
+9
+支付方式：信用卡（Stripe）
+P0
+□ Pass  □ Fail
+10
+支付安全标识显示
+P1
+□ Pass  □ Fail
+11
+[Place Order] 按钮
+P0
+□ Pass  □ Fail
+12
+订单确认页面
+P0
+□ Pass  □ Fail
+13
+订单确认邮件发送
+P0
+□ Pass  □ Fail
+4. B2B 功能测试 / B2B Features Testing
+4.1 B2B 入口与导航
+#
+测试项
+优先级
+结果
+备注
+1
+导航栏 "For Business / Bulk Order" 入口可见
+P0
+□ Pass  □ Fail
+2
+产品详情页 "Request Bulk Quote" 按钮可见
+P0
+□ Pass  □ Fail
+3
+B2B 专区落地页内容完整
+P0
+□ Pass  □ Fail
+4.2 询盘表单
+#
+测试项
+优先级
+结果
+备注
+1
+表单字段：Full Name *（必填验证）
+P0
+□ Pass  □ Fail
+2
+表单字段：Company Name *（必填验证）
+P0
+□ Pass  □ Fail
+3
+表单字段：Email Address *（格式验证）
+P0
+□ Pass  □ Fail
+4
+表单字段：Phone Number
+P1
+□ Pass  □ Fail
+5
+表单字段：Country *（下拉选择）
+P0
+□ Pass  □ Fail
+6
+表单字段：Interested Product(s) *（多选/搜索）
+P0
+□ Pass  □ Fail
+7
+表单字段：Estimated Quantity *（下拉：10-50/50-100/100-500/500+）
+P0
+□ Pass  □ Fail
+8
+表单字段：Project Description *（多行文本）
+P0
+□ Pass  □ Fail
+9
+文件上传功能（PDF/DOC/图片）
+P1
+□ Pass  □ Fail
+10
+[Submit Request] 按钮
+P0
+□ Pass  □ Fail
+11
+提交成功提示页面/弹窗
+P0
+□ Pass  □ Fail
+12
+销售团队收到邮件通知
+P0
+□ Pass  □ Fail
+13
+客户收到确认邮件
+P0
+□ Pass  □ Fail
+14
+侧边栏：联系方式/响应承诺/信任标识
+P1
+□ Pass  □ Fail
+4.3 B2B 内容页
+#
+测试项
+优先级
+结果
+备注
+1
+OEM/ODM 定制服务介绍页
+P1
+□ Pass  □ Fail
+2
+工程案例/项目展示页
+P1
+□ Pass  □ Fail
+3
+下载中心（产品手册/认证/IES文件）
+P1
+□ Pass  □ Fail
+4
+认证展示页（CE/RoHS/FCC/UL）
+P1
+□ Pass  □ Fail
+5. 用户账户 / User Account
+#
+测试项
+优先级
+结果
+备注
+1
+用户注册（邮箱+密码）
+P0
+□ Pass  □ Fail
+2
+注册邮箱验证
+P0
+□ Pass  □ Fail
+3
+用户登录（邮箱+密码）
+P0
+□ Pass  □ Fail
+4
+社交登录：Google
+P1
+□ Pass  □ Fail
+5
+社交登录：Facebook
+P1
+□ Pass  □ Fail
+6
+忘记密码/重置密码
+P0
+□ Pass  □ Fail
+7
+个人中心：订单历史
+P0
+□ Pass  □ Fail
+8
+个人中心：订单详情/物流追踪
+P0
+□ Pass  □ Fail
+9
+个人中心：地址管理
+P0
+□ Pass  □ Fail
+10
+个人中心：账户信息编辑
+P1
+□ Pass  □ Fail
+11
+愿望清单/收藏夹
+P2
+□ Pass  □ Fail
+12
+退出登录
+P0
+□ Pass  □ Fail
+6. 性能测试 / Performance Testing
+#
+测试项
+优先级
+结果
+备注
+1
+首页加载时间 < 3秒（首次访问，3G网络）
+P0
+□ Pass  □ Fail
+2
+首页加载时间 < 1.5秒（缓存后）
+P0
+□ Pass  □ Fail
+3
+产品列表页加载 < 2秒
+P0
+□ Pass  □ Fail
+4
+产品详情页加载 < 2秒
+P0
+□ Pass  □ Fail
+5
+Google PageSpeed Insights 移动端评分 > 70
+P1
+□ Pass  □ Fail
+6
+Google PageSpeed Insights 桌面端评分 > 85
+P1
+□ Pass  □ Fail
+7
+图片懒加载正常工作
+P0
+□ Pass  □ Fail
+8
+CDN 加速生效
+P1
+□ Pass  □ Fail
+9
+缓存策略生效（浏览器缓存/服务器缓存）
+P1
+□ Pass  □ Fail
+7. 响应式测试 / Responsive Testing
+#
+测试项
+优先级
+结果
+备注
+1
+Desktop (1920x1080)：布局正常，无横向滚动
+P0
+□ Pass  □ Fail
+2
+Laptop (1366x768)：布局正常
+P0
+□ Pass  □ Fail
+3
+Tablet Landscape (1024x768)：布局正常
+P0
+□ Pass  □ Fail
+4
+Tablet Portrait (768x1024)：布局正常
+P0
+□ Pass  □ Fail
+5
+Mobile (375x667)：布局正常，触控友好
+P0
+□ Pass  □ Fail
+6
+Mobile 导航汉堡菜单正常
+P0
+□ Pass  □ Fail
+7
+Mobile 产品图片可左右滑动
+P0
+□ Pass  □ Fail
+8
+Mobile 结算流程可顺利完成
+P0
+□ Pass  □ Fail
+9
+跨浏览器测试：Chrome
+P0
+□ Pass  □ Fail
+10
+跨浏览器测试：Firefox
+P0
+□ Pass  □ Fail
+11
+跨浏览器测试：Safari
+P0
+□ Pass  □ Fail
+12
+跨浏览器测试：Edge
+P0
+□ Pass  □ Fail
+8. SEO 测试 / SEO Testing
+#
+测试项
+优先级
+结果
+备注
+1
+首页 Meta Title 正确设置
+P0
+□ Pass  □ Fail
+2
+首页 Meta Description 正确设置
+P0
+□ Pass  □ Fail
+3
+产品页 Meta Title/Description 正确
+P0
+□ Pass  □ Fail
+4
+Canonical URL 设置正确
+P1
+□ Pass  □ Fail
+5
+XML Sitemap 生成并提交
+P0
+□ Pass  □ Fail
+6
+Robots.txt 配置正确
+P0
+□ Pass  □ Fail
+7
+Schema.org 结构化数据（产品）
+P1
+□ Pass  □ Fail
+8
+Schema.org 结构化数据（面包屑）
+P1
+□ Pass  □ Fail
+9
+Open Graph 标签（Facebook 分享）
+P1
+□ Pass  □ Fail
+10
+Twitter Card 标签
+P2
+□ Pass  □ Fail
+11
+Alt 标签：所有产品图片
+P0
+□ Pass  □ Fail
+12
+HTTPS 全站启用
+P0
+□ Pass  □ Fail
+13
+404 页面自定义
+P1
+□ Pass  □ Fail
+9. 安全测试 / Security Testing
+#
+测试项
+优先级
+结果
+备注
+1
+SSL 证书有效（HTTPS）
+P0
+□ Pass  □ Fail
+2
+支付页面 PCI DSS 合规
+P0
+□ Pass  □ Fail
+3
+SQL 注入防护
+P0
+□ Pass  □ Fail
+4
+XSS 防护
+P0
+□ Pass  □ Fail
+5
+CSRF 防护
+P0
+□ Pass  □ Fail
+6
+登录失败限制（防暴力破解）
+P1
+□ Pass  □ Fail
+7
+密码强度要求
+P1
+□ Pass  □ Fail
+8
+敏感数据加密存储
+P0
+□ Pass  □ Fail
+9
+安全头部设置（HSTS/X-Frame-Options等）
+P1
+□ Pass  □ Fail
+10. 第三方集成测试 / Third-party Integrations
+#
+测试项
+优先级
+结果
+备注
+1
+PayPal 支付流程
+P0
+□ Pass  □ Fail
+2
+Stripe 信用卡支付
+P0
+□ Pass  □ Fail
+3
+Google Analytics 4 事件追踪
+P1
+□ Pass  □ Fail
+4
+Meta Pixel (Facebook Pixel)
+P1
+□ Pass  □ Fail
+5
+Google Ads 转化追踪
+P1
+□ Pass  □ Fail
+6
+Live Chat（Tawk.to / Tidio）
+P0
+□ Pass  □ Fail
+7
+WhatsApp 点击聊天
+P0
+□ Pass  □ Fail
+8
+邮件服务（SMTP/第三方如SendGrid）
+P0
+□ Pass  □ Fail
+9
+社交分享按钮
+P2
+□ Pass  □ Fail
+11. 后台管理测试 / Admin Panel Testing
+#
+测试项
+优先级
+结果
+备注
+1
+产品管理：添加/编辑/删除产品
+P0
+□ Pass  □ Fail
+2
+产品管理：批量导入/导出
+P1
+□ Pass  □ Fail
+3
+订单管理：查看/处理订单
+P0
+□ Pass  □ Fail
+4
+订单管理：订单状态更新
+P0
+□ Pass  □ Fail
+5
+询盘管理：查看 B2B 询盘
+P0
+□ Pass  □ Fail
+6
+询盘管理：询盘状态跟踪
+P1
+□ Pass  □ Fail
+7
+客户管理：查看注册用户
+P0
+□ Pass  □ Fail
+8
+报表：销售统计
+P1
+□ Pass  □ Fail
+9
+报表：流量统计
+P1
+□ Pass  □ Fail
+10
+优惠券/促销码管理
+P1
+□ Pass  □ Fail
+11
+运费设置
+P0
+□ Pass  □ Fail
+12
+税费设置
+P0
+□ Pass  □ Fail
+12. 测试总结 / Test Summary
+12.1 统计
+项目
+数量
+总测试项
+_______
+通过 (Pass)
+_______
+失败 (Fail)
+_______
+不适用 (N/A)
+_______
+通过率
+_______ %
+12.2 问题汇总
+#
+问题描述
+优先级
+状态
+负责人
+备注
+1
+2
+3
+4
+5
+12.3 签署
+角色
+签名/日期
+测试人员
+____________________
+项目经理
+____________________
+客户确认
+____________________
+--- End of UAT Document ---

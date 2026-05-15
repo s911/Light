@@ -168,6 +168,7 @@ sudo -u www-data wp core install \
 - WooCommerce
 - Stage Lighting B2B Quote
 - Stage Lighting Site Setup
+- Nextend Social Login（Google/Facebook）
 - Rank Math
 - Wordfence
 - LiteSpeed Cache / WP Rocket
@@ -177,6 +178,23 @@ sudo -u www-data wp core install \
 
 - WordPress 后台安装插件不支持 `--proxy` 参数。
 - 若必须命令行下载插件包，使用 `curl -x ${PROXY_URL}` 先下载 zip，再后台上传或 WP-CLI 安装。
+
+---
+
+## 10.1 WooCommerce 运费/税费规则脚本（Docker 方案）
+
+若你是使用本项目 Docker 方案部署，可直接在项目根目录执行：
+
+```bash
+# 调试环境（自动读取 config/commerce-rules.debug.json）
+bash scripts/wp-configure-commerce-rules.sh
+
+# 生产环境（自动读取 config/commerce-rules.prod.json）
+bash scripts/wp-configure-commerce-rules.sh --prod
+
+# 指定自定义规则
+bash scripts/wp-configure-commerce-rules.sh --prod --rules config/commerce-rules.prod.json
+```
 
 ---
 
